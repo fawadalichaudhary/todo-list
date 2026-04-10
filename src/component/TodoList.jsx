@@ -1,27 +1,31 @@
-import { Trash } from "lucide-react";
-import React, { useState } from "react";
-import Data from "./Data.json";
+import { Loader2, Trash } from "lucide-react";
+import { useState } from "react";
+import TodoCard from "./TodoCard";
 
 const TodoList = () => {
-    const [Todos, setTodos] = useState(Data);
+    const [Todos, setTodos] = useState({});
     const [input, setInput] = useState("");
+
 
     const addTask = (e) => {
         e.preventDefault();
 
         if (!input) return;
-
-        const newId = Object.keys(Todos).length + 1;
-
+        const newId = Math.max(...Object.keys(Todos), 0) + 1
         setTodos({
             ...Todos,
             [newId]: input
         });
+        console.log("after todo", Todos)
+
 
         setInput("");
     };
 
-    const deleteTask = (id) => {
+    const delay = (timeInMs) => new Promise(resolve => setTimeout(resolve, timeInMs))
+
+    const deleteTask = async (id) => {
+        await delay(1000)
         const newTodos = { ...Todos };
         delete newTodos[id];
         setTodos(newTodos);
@@ -30,8 +34,8 @@ const TodoList = () => {
     return (
         <div className="h-screen w-full flex justify-center items-center">
             <div className="bg-[#9465FF] h-96 w-80 p-2.5 rounded-sm">
-                <div className="bg-black/45 h-full w-full overflow-y-auto ">
-                    <form className="p-5 text-white flex justify-center gap-2.5">
+                <div className="bg-black/45 h-full w-full overflow-y-auto p-5 space-y-5">
+                    <form className="text-white flex justify-center gap-2.5">
                         <input
                             className="bg-[#19738B] h-10 rounded-lg pl-3"
                             type="text"
@@ -50,12 +54,8 @@ const TodoList = () => {
 
                     <div className="flex gap-2 flex-col justify-between items-center ">
                         {Object.keys(Todos).map((id) => (
-                            <div key={id} className="bg-[#C005AA] flex gap-2 items-center justify-between w-4/5 px-4 pt-2 pb-4 rounded-sm text-xs">
-                                <div className="overflow-x-auto text-white">{Todos[id]}</div>
-
-                                <button onClick={() => deleteTask(id)}>
-                                    <Trash className="text-white h-5 w-3" />
-                                </button>
+                            <div key={id} className="w-full">
+                                <TodoCard value={Todos[id]} deleteTask={() => deleteTask(id)} />
                             </div>
                         ))}
                     </div>
